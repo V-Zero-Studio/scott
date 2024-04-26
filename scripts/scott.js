@@ -34,43 +34,28 @@ const INTERVAL_MOUSE = 1000
 let _bufferMouseMove = new Buffer(BUFFER_SIZE)
 let _distMove = 0
 let _xPrev, _yPrev
+let _distWheel = 0
 
 const onMouseDown = (e) => {
-  // _xPrev = e.clientX
-  // _yPrev = e.clientY
-
-  // _entryMouseMove = {
-  //   start: e.timeStamp,
-  //   end: undefined,
-  //   distMove: 0
-  // }
 }
 
 const onMouseMove = (e) => {
-  // const entry = {
-  //   timeStamp: e.timeStamp,
-  //   x: e.clientX,
-  //   y: e.clientY,
-  //   delta: Math.sqrt(Math.pow(e.clientX - _xPrev, 2) + Math.pow(e.clientY - _yPrev, 2))
-  // }
-
   if (_xPrev != undefined && _yPrev != undefined) {
     let delta = Math.sqrt(Math.pow(e.clientX - _xPrev, 2) + Math.pow(e.clientY - _yPrev, 2))
 
     _distMove += delta
   }
-  // if(entry.delta > 0) {
-  //   _bufferMouseMove.add(entry)
-  // }
 
   _xPrev = e.clientX
   _yPrev = e.clientY
 }
 
 const onMouseUp = (e) => {
-  _entryMouseMove.end = e.timeStamp
-  console.log(_entryMouseMove)
-  _bufferMouseMove.add(_entryMouseMove)
+}
+
+const onWheel = (e) => {
+  _distWheel += Math.abs(e.wheelDelta)
+  // console.log("wheel", _distWheel)
 }
 
 const logMouseMoveActivities = () => {
@@ -78,7 +63,7 @@ const logMouseMoveActivities = () => {
     timeStamp: Date.now(),
     distMove: _distMove
   }
-  console.log(entry)
+  // console.log(entry)
   _bufferMouseMove.add(entry)
   _distMove = 0
 
@@ -91,6 +76,7 @@ const logMouseMoveActivities = () => {
   document.addEventListener("mousedown", onMouseDown)
   document.addEventListener("mousemove", onMouseMove)
   document.addEventListener("mouseup", onMouseUp)
+  document.addEventListener("wheel", onWheel)
 
   logMouseMoveActivities()
 
