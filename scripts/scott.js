@@ -29,20 +29,22 @@ class Buffer {
 }
 
 const BUFFER_SIZE = 128
-const INTERVAL_MOUSE = 1000
+const INTERVAL_ACTIVITY_LOG = 1000
 
-let _bufferMouseMove = new Buffer(BUFFER_SIZE)
+let _bufferActivities = new Buffer(BUFFER_SIZE)
 let _distMove = 0
 let _xPrev, _yPrev
 let _distWheel = 0
+let _cntMouseDown = 0
+let _cntKeyDown = 0
 
 const onMouseDown = (e) => {
+  _cntMouseDown++
 }
 
 const onMouseMove = (e) => {
   if (_xPrev != undefined && _yPrev != undefined) {
     let delta = Math.sqrt(Math.pow(e.clientX - _xPrev, 2) + Math.pow(e.clientY - _yPrev, 2))
-
     _distMove += delta
   }
 
@@ -55,21 +57,31 @@ const onMouseUp = (e) => {
 
 const onWheel = (e) => {
   _distWheel += Math.abs(e.wheelDelta)
-  // console.log("wheel", _distWheel)
 }
 
-const logMouseMoveActivities = () => {
+const onKeyDown = (e) => {
+  _cntKeyDown++
+}
+
+const logActivities = () => {
   let entry = {
     timeStamp: Date.now(),
-    distMove: _distMove
+    distMove: Math.floor(_distMove),
+    distWheel: _distWheel,
+    cntMouseDown: _cntMouseDown,
+    cntKeyDown: _cntKeyDown
   }
-  // console.log(entry)
-  _bufferMouseMove.add(entry)
+  
+  console.log(entry)
+  _bufferActivities.add(entry)
   _distMove = 0
+  _distWheel = 0
+  _cntMouseDown = 0
+  _cntKeyDown = 0
 
   setTimeout(() => {
-    logMouseMoveActivities()
-  }, INTERVAL_MOUSE);
+    logActivities()
+  }, INTERVAL_ACTIVITY_LOG);
 }
 
 (function () {
@@ -77,7 +89,8 @@ const logMouseMoveActivities = () => {
   document.addEventListener("mousemove", onMouseMove)
   document.addEventListener("mouseup", onMouseUp)
   document.addEventListener("wheel", onWheel)
+  document.addEventListener("keydown", onKeyDown)
 
-  logMouseMoveActivities()
+  logActivities()
 
 })();
