@@ -28,10 +28,11 @@ class Buffer {
   }
 }
 
-const BUFFER_SIZE = 128
+const WINDOW_ACTIVENESS = 60 // s
 const INTERVAL_ACTIVITY_LOG = 1000
 
-let _bufferActivities = new Buffer(BUFFER_SIZE)
+let _cntIdleness = 0
+let _bufferActivities = new Buffer(WINDOW_ACTIVENESS)
 let _distMove = 0
 let _xPrev, _yPrev
 let _distWheel = 0
@@ -64,16 +65,26 @@ const onKeyDown = (e) => {
 }
 
 const logActivities = () => {
-  let entry = {
-    timeStamp: Date.now(),
-    distMove: Math.floor(_distMove),
-    distWheel: _distWheel,
-    cntMouseDown: _cntMouseDown,
-    cntKeyDown: _cntKeyDown
-  }
+  // let entry = {
+  //   timeStamp: Date.now(),
+  //   distMove: Math.floor(_distMove),
+  //   distWheel: _distWheel,
+  //   cntMouseDown: _cntMouseDown,
+  //   cntKeyDown: _cntKeyDown
+  // }
   
-  console.log(entry)
-  _bufferActivities.add(entry)
+  // console.log(entry)
+  // _bufferActivities.add(entry)
+  
+
+  if(_distMove + _distWheel + _cntMouseDown + _cntKeyDown == 0) {
+    _cntIdleness += 1
+  } else {
+    _cntIdleness = 0
+  }
+
+  console.log("idleness", _cntIdleness)
+
   _distMove = 0
   _distWheel = 0
   _cntMouseDown = 0
